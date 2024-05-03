@@ -123,12 +123,15 @@
     </nav>
 </head>
 <body>
-    <form action="/login" method="post">
-        <label for="username_or_email">Username or Email:</label><br>
-        <input type="text" id="username_or_email" name="username_or_email"><br>
+    <form method="post">
+        <label for="email">Username or Email:</label><br>
+        <input type="text" id="email" name="email"><br>
         <label for="password">Password:</label><br>
         <input type="password" id="password" name="password"><br><br>
         <input type="submit" value="Login">
+        {% if error %}
+        <p style="color: red">{{ error }}</p>
+        {% endif %}
     </form>
 </body>
 </html>

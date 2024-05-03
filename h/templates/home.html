@@ -234,8 +234,13 @@
     <a href="/">Home</a>
     <a href="/products">Products</a>
     <a href="#Vendors">Vendors</a>
+    {% if session.logged_in %}
+    <a href="/logout">LOGOUT</a>
+    <a href="/cart">CART</a>
+    {% else %}
     <a href="/signup">Sign-Up</a>
     <a href="/login">Log-In</a>
+    {% endif %}
     <div class="animation start-home"></div>
   </nav>
   <div class="shopping-cart-button">

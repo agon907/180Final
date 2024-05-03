@@ -124,6 +124,9 @@
 </head>
 <body>
     <form action="/signup" method="post">
+    {% if error %}
+    <p style="color: red">{{ error }}</p>
+    {% endif %}
     <label for="firstname">First Name:</label><br>
     <input type="text" id="firstname" name="firstname"><br>
     <label for="lastname">Last Name:</label><br>
