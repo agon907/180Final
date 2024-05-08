@@ -1,7 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Home</title>
     <style>
         nav {
             margin: 27px auto 0;
@@ -78,7 +74,7 @@
             background-color: #3498db;
         }
 
-        nav .start-portefolio,
+        nav .start-portfolio,
         a:nth-child(4):hover~.animation {
             width: 160px;
             left: 310px;
@@ -108,14 +104,14 @@
             color: #ecf0f1;
         }
 
-        .product-grid {
+        .vendor-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 20px; /* Add gap between product cards */
         }
 
-        .product-card {
+        .vendor-card {
             width: 250px;
             background-color: #fff;
             border-radius: 8px;
@@ -123,77 +119,21 @@
             padding: 20px;
         }
 
-        .product-card img {
-            width: 100%;
-            border-radius: 8px;
-        }
-
-        .product-card h3 {
+        .vendor-card h3 {
             margin-top: 10px;
             padding: 20px;
         }
 
-        .product-card p {
+        .vendor-card p {
             margin-top: 10px;
         }
 
-        .product-card .price {
+        .vendor-card{
             display: block;
             margin-top: 10px;
             font-weight: bold;
             color: #3498db;
         }
-
-        .product-card button,
-        .promotion a {
-            display: block;
-            width: 100%;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 150px;
-            padding: 12px;
-        }
-
-        .product-card button:hover,
-        .promotion a:hover {
-            background-color: #2980b9;
-        }
-
-        .promotions {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .promotion {
-            width: 250px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-
-        .promotion img {
-            width: 100%;
-            border-radius: 8px;
-        }
-
-        .promotion h3 {
-            margin-top: 10px;
-            padding: 20px;
-        }
-
-        .promotion p {
-            margin-top: 10px;
-        }
-
         footer {
             margin-top: auto;
             padding-top: 50px;
@@ -203,31 +143,36 @@
             font-size: 14px;
             text-align: center;
         }
-       .shopping-cart-button {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background-color: #fff;
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+
+       .vendor-cart-button {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background-color: #fff;
+          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+            display: flex;
+          justify-content: center;
+          align-items: center;
         }
-        .shopping-cart-button a {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        text-decoration: none;
-        color: white;
-        font-size: 20px;
-        text-align: center;
+        .vendor-cart-button a {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+          text-decoration: none;
+          color: white;
+          font-size: 20px;
+          text-align: center;
         }
-    </style>
+</style>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products</title>
 </head>
 <body>
   <nav>
@@ -243,29 +188,33 @@
     {% endif %}
     <div class="animation start-home"></div>
   </nav>
-  <div class="shopping-cart-button">
-    <a href="/cart">
-    <span>🛒</span>
-    </a>
-</div>
-  <section id="products" class="section">
-    <h2>Featured Products</h2>
-    <div class="product-grid">
-      <div class="product-card">
-        <img src="product1.jpg" alt="Product 1">
-        <h3>Product Name</h3>
-        <span class="price"></span>
-        <button>Add to Cart</button>
+  <section id="vendor" class="section">
+    <h2>Our Vendors</h2>
+    <div class="vendor-grid">
+      <div class="vendor-card">
+        <h3>Vendor 1</h3>
+        <p>Vendor info</p>
+        <button><a href="/login/vendors">Work here?</a></button>
       </div>
     </div>
   </section>
-  <section id="promotional" class="section">
-    <h2>Special Offers</h2>
-    <div class="promotions">
-      <div class="promotion">
-        <img src="promo1.jpg" alt="Promotion 1">
-        <h3>Special Offer</h3>
-        <a href="/products">Shop Now</a>
+    <section id="vendor" class="section">
+    <h2>Our Vendors</h2>
+    <div class="vendor-grid">
+      <div class="vendor-card">
+        <h3>Vendor 2</h3>
+        <p>Vendor info</p>
+        <button><a href="/login/vendors">Work here?</a></button>
+      </div>
+    </div>
+  </section>
+    <section id="vendor" class="section">
+    <h2>Our Vendors</h2>
+    <div class="vendor-grid">
+      <div class="vendor-card">
+        <h3>Vendor 3</h3>
+        <p>Vendor info</p>
+        <button><a href="/login/vendors">Work here?</a></button>
       </div>
     </div>
   </section>

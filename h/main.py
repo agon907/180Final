@@ -15,6 +15,12 @@ class customer(db.Model):
     password = db.Column(db.Text)
 
 
+class vendor(db.Model):
+    vendorid = db.Column(db.Text, unique=True, primary_key=True)
+    username = db.Column(db.Text)
+    password = db.Column(db.Text)
+
+
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -54,7 +60,7 @@ def login():
     if request.method == 'POST':
         email_or_username = request.form['email']
         password = request.form['password']
-        user = customer.query.filter((customer.email == email_or_username) | (customer.username == email_or_username)).first()
+        user = (customer.query.filter((customer.email == email_or_username) | (customer.username == email_or_username)).first())
 
         if user and user.password == password:
             session['logged_in'] = True
@@ -82,6 +88,29 @@ def cart():
 def checkout():
     # checkout functionality here
     return render_template('checkout.html')
+
+
+@app.route('/vendors')
+def vendors():
+    return render_template('vendors.html')
+
+
+@app.route('/login/vendors', methods=['GET', 'POST'])
+def vendorlog():
+    if 'logged_in' in session:
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        vendorid_or_username = request.form['email']
+        password = request.form['password']
+        user = (vendor.query.filter((vendor.vendorid == vendorid_or_username) | (vendor.username == vendorid_or_username)).first())
+
+        if user and user.password == password:
+            session['logged_in'] = True
+            return redirect(url_for('home'))
+        else:
+            error = 'Invalid username or password. Please try again.'
+            return render_template('login.html', error=error)
+    return render_template('login.html')
 
 
 @app.route('/logout')
