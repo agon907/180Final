@@ -4,6 +4,11 @@
 {% extends 'base.html' %}
 {% block body %}
 <main>
+    <div class="shopping-cart-button">
+        <a href="/cart">
+        <span>🛒</span>
+        </a>
+    </div>
     {% if session.username == 'vendor' %}
         <form action="/vendors/add" method="post" class="add-product-form">
             <input type="text" name="title" placeholder="Product Name">
