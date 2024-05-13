@@ -4,10 +4,53 @@
 {% extends 'base.html' %}
 {% block body %}
 <main>
-    <ul>
-        {% for product in products %}
-            <li>{{ product.name }} - ${{ product.price }}</li>
+    {% if session.username == 'vendor' %}
+        <form action="/vendors/add" method="post" class="add-product-form">
+            <input type="text" name="title" placeholder="Product Name">
+            <input type="text" name="description" placeholder="Product description">
+            <input type="text" name="warranty" placeholder="Product Warranty">
+            <input type="text" name="colors" placeholder="Product Colors">
+            <input type="text" name="img" placeholder="Product img">
+            <input type="number" name="price" placeholder="Price">
+            <input type="text" name="sizes" placeholder="Item type">
+            <button type="submit">Add Product</button>
+        </form>
+    {% endif %}
+
+<div class="container">
+    <div class="products">
+        {% for prod in products %}
+            <div class="product-card">
+                <img src="{{ prod.img }}" alt="{{ prod.title }}">
+                <div class="product-info">
+                    <h2>{{ prod.title }}</h2>
+                    <p class="price">${{ prod.price }}</p>
+                    <p>{{ prod.description }}</p>
+                    {% if prod.sizes is not none and 'clothes' in prod.sizes %}
+                    <select class="sizes">
+                        <option>small</option>
+                        <option>medium</option>
+                        <option>large</option>
+                    </select>
+                    {% endif %}
+                    {% if prod.sizes is not none and 'shoes' in prod.sizes %}
+                    <select class="sizes">
+                        <option>US 7</option>
+                        <option>US 7.5</option>
+                        <option>US 8</option>
+                        <option>US 8.5</option>
+                        <option>US 9</option>
+                        <option>US 9.5</option>
+                        <option>US 10</option>
+                        <option>US 10.5</option>
+                        <option>US 11</option>
+                    </select>
+                    {% endif %}
+                    <button>Add to Cart</button>
+                </div>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
+</div>
 </main>
 {% endblock %}
