@@ -21,6 +21,16 @@ class vendor(db.Model):
     password = db.Column(db.Text)
 
 
+class product(db.Model):
+    productid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.Text)
+    description = db.Column(db.Text)
+    warranty = db.Column(db.Text)
+    colors = db.Column(db.Text)
+    sizes = db.Column(db.Text)
+    price = db.Column(db.Text)
+    img = db.Column(db.Text)
+
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -64,6 +74,7 @@ def login():
 
         if user and user.password == password:
             session['logged_in'] = True
+            session['username'] = 'customer'
             return redirect(url_for('home'))
         else:
             error = 'Invalid username or password. Please try again.'
@@ -74,7 +85,7 @@ def login():
 @app.route('/products')
 def product_list():
     # products from the database here
-    products = []
+    products = product.query.all()
     return render_template('products.html', products=products)
 
 
@@ -102,16 +113,37 @@ def vendorlog():
     if request.method == 'POST':
         vendorid_or_username = request.form['email']
         password = request.form['password']
-        user = (vendor.query.filter((vendor.vendorid == vendorid_or_username) | (vendor.username == vendorid_or_username)).first())
+        vendors = (vendor.query.filter((vendor.vendorid == vendorid_or_username) | (vendor.username == vendorid_or_username)).first())
 
-        if user and user.password == password:
+        if vendors and vendors.password == password:
             session['logged_in'] = True
+            session['username'] = 'vendor'
             return redirect(url_for('home'))
         else:
             error = 'Invalid username or password. Please try again.'
             return render_template('login.html', error=error)
     return render_template('login.html')
 
+
+@app.route('/vendors/add', methods=['POST'])
+def add_product():
+    if session.get('username') == 'vendor':
+        title = request.form['title']
+        price = request.form['price']
+        description = request.form['description']
+        warranty = request.form['warranty']
+        img = request.form['img']
+        sizes = request.form['sizes']
+        new_product = product(title=title, price=price, img=img, warranty=warranty, description=description, sizes=sizes)
+        db.session.add(new_product)
+        try:
+            db.session.commit()
+            return redirect(url_for('product_list'))
+        except Exception as e:
+            db.session.rollback()
+            return "Error: " + str(e)
+    else:
+        return "Unauthorized", 403
 
 @app.route('/logout')
 def logout():
