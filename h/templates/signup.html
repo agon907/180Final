@@ -1,10 +1,129 @@
+<!DOCTYPE html>
+<html>
 <head>
     <title>Sign Up</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c3e50;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        form {
+            width: 300px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+}
+
+
+        nav {
+            margin: 27px auto 0;
+            position: relative;
+            width: 121px;
+            height: 50px;
+            background-color: #34495e;
+            border-radius: 8px;
+            font-size: 0;
+        }
+
+        nav a {
+            line-height: 50px;
+            height: 100%;
+            font-size: 15px;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+            text-decoration: none;
+            text-transform: uppercase;
+            text-align: center;
+            color: white;
+            cursor: pointer;
+        }
+
+        nav .animation {
+            position: absolute;
+            height: 100%;
+            top: 0;
+            z-index: 0;
+            transition: all .5s ease 0s;
+            border-radius: 8px;
+        }
+
+        a:nth-child(1) {
+            width: 120px;
+        }
+
+        nav .start-home, a:nth-child(1):hover~.animation {
+            width: 120px;
+            left: 0;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Hide other links */
+        nav a:nth-child(n+2) {
+            display: none;
+        }
+    </style>
+    <nav>
+        <a href="/">Back to Home</a>
+        <div class="animation start-home"></div>
+    </nav>
 </head>
-{% extends 'base.html' %}
-{% block body %}
-<main>
-    <form action="/signup" method="post">
+<body>
+    <form action="/signup" method="post" id="signupForm">
     {% if error %}
     <p style="color: red">{{ error }}</p>
     {% endif %}
@@ -12,13 +131,42 @@
     <input type="text" id="firstname" name="firstname"><br>
     <label for="lastname">Last Name:</label><br>
     <input type="text" id="lastname" name="lastname"><br>
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email"><br>
     <label for="username">Username:</label><br>
     <input type="text" id="username" name="username"><br>
     <label for="password">Password:</label><br>
     <input type="password" id="password" name="password"><br><br>
+
+    <label for="role">Role:</label><br>
+    <select id="role" name="role">
+        <option value="customer">Customer</option>
+        <option value="admin">Admin</option>
+    </select><br><br>
+
+    <div id="emailField">
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email"><br>
+    </div>
+
     <input type="submit" value="Sign Up">
-    </form>
-</main>
-{% endblock %}
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var roleSelect = document.getElementById('role');
+    var emailField = document.getElementById('emailField');
+
+    roleSelect.addEventListener('change', function() {
+        if (roleSelect.value === 'admin') {
+            emailField.style.display = 'none';
+        } else {
+            emailField.style.display = 'block';
+        }
+    });
+});
+</script>
+
+
+
+</body>
+</html>
+
