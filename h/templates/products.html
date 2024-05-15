@@ -1,6 +1,3 @@
-<head>
-    <title>Products</title>
-</head>
 {% extends 'base.html' %}
 {% block body %}
 <main>
@@ -9,6 +6,15 @@
         <span>🛒</span>
         </a>
     </div>
+
+    <!-- Search bar -->
+    <div class="search-bar">
+    <form action="/search" method="get">
+        <input type="text" name="query" placeholder="Search for products...">
+        <button type="submit">Search</button>
+    </form>
+</div>
+
     {% if session.username == 'vendor' %}
         <form action="/vendors/add" method="post" class="add-product-form">
             <input type="text" name="title" placeholder="Product Name">
@@ -22,41 +28,42 @@
         </form>
     {% endif %}
 
-<div class="container">
-    <div class="products">
-        {% for prod in products %}
-            <div class="product-card">
-                <img src="{{ prod.img }}" alt="{{ prod.title }}">
-                <div class="product-info">
-                    <h2>{{ prod.title }}</h2>
-                    <p class="price">${{ prod.price }}</p>
-                    <p>{{ prod.description }}</p>
-                    {% if prod.sizes is not none and 'clothes' in prod.sizes %}
-                    <select class="sizes">
-                        <option>small</option>
-                        <option>medium</option>
-                        <option>large</option>
-                    </select>
-                    {% endif %}
-                    {% if prod.sizes is not none and 'shoes' in prod.sizes %}
-                    <select class="sizes">
-                        <option>US 7</option>
-                        <option>US 7.5</option>
-                        <option>US 8</option>
-                        <option>US 8.5</option>
-                        <option>US 9</option>
-                        <option>US 9.5</option>
-                        <option>US 10</option>
-                        <option>US 10.5</option>
-                        <option>US 11</option>
-                    </select>
-                    {% endif %}
-                    <button>Add to Cart</button>
+    <div class="container">
+        <div class="product-grid">
+            {% for prod in products %}
+                <div class="product-card">
+                    <img src="{{ prod.img }}" alt="{{ prod.title }}">
+                    <div class="product-info">
+                        <h3>{{ prod.title }}</h3>
+                        <span class="price">${{ prod.price }}</span>
+                        <p>{{ prod.description }}</p>
+                        {% if prod.sizes is not none and 'clothes' in prod.sizes %}
+                        <select class="sizes">
+                            <option>small</option>
+                            <option>medium</option>
+                            <option>large</option>
+                        </select>
+                        {% endif %}
+                        {% if prod.sizes is not none and 'shoes' in prod.sizes %}
+                        <select class="sizes">
+                            <option>US 7</option>
+                            <option>US 7.5</option>
+                            <option>US 8</option>
+                            <option>US 8.5</option>
+                            <option>US 9</option>
+                            <option>US 9.5</option>
+                            <option>US 10</option>
+                            <option>US 10.5</option>
+                            <option>US 11</option>
+                        </select>
+                        {% endif %}
+                        <button>Add to Cart</button>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
-</div>
 </main>
 {% endblock %}
+
 

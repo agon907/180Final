@@ -342,7 +342,7 @@ input[type="email"] {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px; /* Add gap between product cards */
+    gap: 20px;
 }
 
 .product-card {
@@ -424,4 +424,39 @@ input[type="email"] {
     flex-wrap: wrap;
     justify-content: space-around;
     padding: 20px;
+}
+
+    text-align: center;
+    margin: 20px 0;
+}
+
+.search-bar form {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.search-bar input[type="text"] {
+    padding: 10px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    width: 300px;
+}
+
+.search-bar button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+}
+
+.search-bar button:hover {
+    background-color: #2980b9;
 }

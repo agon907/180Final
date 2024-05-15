@@ -273,5 +273,15 @@ def logout():
     return redirect('login')
 
 
+@app.route('/search')
+def search():
+    query = request.args.get('query', '')
+    if query:
+        products = Product.query.filter(Product.title.ilike(f'%{query}%')).all()
+    else:
+        products = Product.query.all()
+    return render_template('products.html', products=products)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
