@@ -1,0 +1,24 @@
+<head>
+    <title>Receipt</title>
+</head>
+{% extends 'base.html' %}
+{% block body %}
+<main>
+    <section id="receipt" class="section">
+        <h2>Thank You!</h2>
+        <p>Below is your order info.</p>
+        <br>
+        <br>
+        <div class="receipt-items">
+            {% for item in receipt_data %}
+            <div class="receipt-item">
+                <h3>{{ item.title }}</h3>
+                <span class="price">${{ item.price }}</span>
+                <span class="quantity">Quantity: {{ item.quantity }}</span><br>
+                <span class="subtotal">Subtotal: ${{ item.subtotal }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+{% endblock %}

@@ -1,12 +1,18 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
-from flask_sqlalchemy import SQLAlchemy, SQLAlchemy
-
+from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Gon20557@localhost/final180'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1234@localhost/final180'
 db = SQLAlchemy(app)
 app.secret_key = 'shhhh'
+
+
+class shopping_cart(db.Model):
+    productid = db.Column(db.Integer, primary_key=True)
+    quantity = db.Column(db.Text, default=1)
+    userid = db.Column(db.Text)
+    cartid = db.Column(db.Text)
 
 
 class Product(db.Model):
@@ -17,7 +23,7 @@ class Product(db.Model):
     colors = db.Column(db.Text, nullable=False)
     sizes = db.Column(db.Text, nullable=False)
     price = db.Column(db.Float, nullable=False)
-
+    img = db.Column(db.Text)
 
 
 class customer(db.Model):
@@ -28,6 +34,7 @@ class customer(db.Model):
     email = db.Column(db.Text)
     password = db.Column(db.Text)
     role = db.Column(db.String(50), default='customer')
+
 
 class admin(db.Model):
     AdminID = db.Column(db.Integer, primary_key=True)
@@ -64,7 +71,8 @@ def add_product():
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/admin/edit-product/<int:product_id>', methods=['POST'])
+@app.route('/admin/edit-product'
+           '/<int:product_id>', methods=['POST'])
 def edit_product(product_id):
     product = Product.query.get_or_404(product_id)
     try:
@@ -80,6 +88,7 @@ def edit_product(product_id):
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)})
 
+
 @app.route('/admin/product-details/<int:product_id>', methods=['GET'])
 def product_details(product_id):
     product = Product.query.get_or_404(product_id)
@@ -94,6 +103,7 @@ def product_details(product_id):
     }
     return jsonify(product_data)
 
+
 @app.route('/products/data')
 def products_data():
     products = Product.query.all()
@@ -107,6 +117,7 @@ def products_data():
         'sizes': product.sizes
     } for product in products]
     return jsonify(products_list)
+
 
 @app.route('/admin/delete-product/<int:product_id>', methods=['POST'])
 def delete_product(product_id):
@@ -133,9 +144,11 @@ class vendor(db.Model):
     username = db.Column(db.Text)
     password = db.Column(db.Text)
 
+
 @app.route('/')
 def home():
     return render_template('home.html')
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -192,6 +205,7 @@ def login():
         if customer_user and customer_user.password == password:
             session['logged_in'] = True
             session['username'] = 'customer'
+            session['user_id'] = customer_user.UserID  # Set user ID in session
             return redirect(url_for('home'))
         elif admin_user and admin_user.password == password:
             session['logged_in'] = True
@@ -213,14 +227,100 @@ def product_list():
 
 @app.route('/cart')
 def cart():
-    # cart functionality here
-    return render_template('cart.html')
+    if 'logged_in' in session and session['username'] == 'customer':
+        user_id = session['user_id']
+        cart_items = shopping_cart.query.filter_by(userid=user_id).all()
+
+        cart_details = []
+        subtotal = 0
+        for item in cart_items:
+            product = Product.query.get(item.productid)
+            item_total = product.price * int(item.quantity)
+            subtotal += item_total
+            cart_details.append({
+                'product_id': item.productid,
+                'title': product.title,
+                'price': product.price,
+                'quantity': item.quantity,
+                'subtotal': item_total
+            })
+
+        tax = round(subtotal * 0.06, 2)
+        shipping_cost = 4
+        total_price = subtotal + tax + shipping_cost
+
+        return render_template('cart.html', cart_details=cart_details, total_price=total_price, tax=tax, shipping_cost=shipping_cost, subtotal=subtotal)
+    else:
+        flash('Please log in to view your cart.', 'error')
+        return redirect(url_for('login'))
 
 
-@app.route('/checkout')
+
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    if 'logged_in' in session and session['username'] == 'customer':
+        product_id = request.form['product_id']
+        user_id = session['user_id']
+
+        existing_item = shopping_cart.query.filter_by(productid=product_id, userid=user_id).first()
+        if existing_item:
+            existing_item.quantity = int(existing_item.quantity) + 1
+        else:
+            new_item = shopping_cart(productid=product_id, userid=user_id)
+            db.session.add(new_item)
+
+        db.session.commit()
+        flash('Item added to cart successfully.', 'success')
+        return redirect(url_for('product_list'))
+    else:
+        flash('Please login to add items to your cart.', 'error')
+        return redirect(url_for('login'))
+
+
+@app.route('/remove_from_cart/<int:product_id>', methods=['POST'])
+def remove_from_cart(product_id):
+    if 'logged_in' in session and session['username'] == 'customer':
+        user_id = session['user_id']
+        item_to_remove = shopping_cart.query.filter_by(userid=user_id, productid=product_id).first()
+        if item_to_remove:
+            item_to_remove.quantity = int(item_to_remove.quantity)
+            if item_to_remove.quantity > 1:
+                item_to_remove.quantity -= 1
+                item_to_remove.quantity = str(item_to_remove.quantity)
+            else:
+                db.session.delete(item_to_remove)
+            db.session.commit()
+            flash('Item removed from cart successfully.', 'success')
+        else:
+            flash('Item not found in cart.', 'error')
+    else:
+        flash('Please log in to perform this action.', 'error')
+    return redirect(url_for('cart'))
+
+
+
+@app.route('/checkout', methods=['POST'])
 def checkout():
-    # checkout functionality here
     return render_template('checkout.html')
+
+@app.route('/receipt', methods=['GET', 'POST'])
+def receipt():
+    user_id = session['user_id']
+    cart_items = shopping_cart.query.filter_by(userid=user_id).all()
+    receipt_data = []
+    for item in cart_items:
+        product = Product.query.get(item.productid)
+        receipt_data.append({
+            'title': product.title,
+            'price': product.price,
+            'quantity': item.quantity,
+            'subtotal': product.price * int(item.quantity)
+        })
+
+    for item in cart_items:
+        db.session.delete(item)
+    db.session.commit()
+    return render_template('receipt.html', receipt_data=receipt_data)
 
 
 @app.route('/vendors')
@@ -233,9 +333,9 @@ def vendorlog():
     if 'logged_in' in session:
         return redirect(url_for('home'))
     if request.method == 'POST':
-        vendorid_or_username = request.form['email']
+        VendorID_or_username = request.form['email']
         password = request.form['password']
-        vendors = (vendor.query.filter((vendor.vendorid == vendorid_or_username) | (vendor.username == vendorid_or_username)).first())
+        vendors = (vendor.query.filter((vendor.VendorID == VendorID_or_username) | (vendor.username == VendorID_or_username)).first())
 
         if vendors and vendors.password == password:
             session['logged_in'] = True
@@ -256,7 +356,7 @@ def add_vendor_product():
         warranty = request.form['warranty']
         img = request.form['img']
         sizes = request.form['sizes']
-        new_product = product(title=title, price=price, img=img, warranty=warranty, description=description, sizes=sizes)
+        new_product = Product(title=title, price=price, img=img, warranty=warranty, description=description, sizes=sizes)
         db.session.add(new_product)
         try:
             db.session.commit()
@@ -265,7 +365,25 @@ def add_vendor_product():
             db.session.rollback()
             return "Error: " + str(e)
     else:
-        return "Unauthorized", 403
+        return "Unauthorized"
+
+
+@app.route('/vendors/remove/<int:product_id>', methods=['POST'])
+def remove_product(product_id):
+    if session.get('username') == 'vendor':
+        remove = Product.query.get(product_id)
+        if remove:
+            db.session.delete(remove)
+            try:
+                db.session.commit()
+                return redirect(url_for('product_list'))
+            except Exception as e:
+                db.session.rollback()
+                return "Error: " + str(e)
+        else:
+            return "Product not found"
+    else:
+        return "Unauthorized"
 
 @app.route('/logout')
 def logout():
@@ -285,3 +403,4 @@ def search():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    print(session)
