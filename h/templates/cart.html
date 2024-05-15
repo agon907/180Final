@@ -9,23 +9,25 @@
         <div class="product-grid">
             {% for item in cart_details %}
             <div class="product-card">
-                <img src="{{ item.image }}" alt="{{ item.title }}">
                 <h3>{{ item.title }}</h3>
                 <span class="price">${{ item.price }}</span>
-                <span class="quantity">Quantity: {{ item.quantity }}</span>
+                <span class="quantity">Quantity: {{ item.quantity }}</span><br>
                 <span class="subtotal">Subtotal: ${{ item.subtotal }}</span>
+                <form method="POST" action="{{ url_for('remove_from_cart', product_id=item.product_id) }}">
+                    <button type="submit">Remove</button>
+                </form>
             </div>
             {% endfor %}
         </div>
         <div class="cart-summary">
-            <p>Subtotal: ${{ total_price }}</p>
             <p>Tax: ${{ tax }}</p>
             <p>Shipping: ${{ shipping_cost }}</p>
-            <p>Total: ${{ total }}</p>
+            <p>Total: ${{ total_price }}</p>
             <form method="POST" action="{{ url_for('checkout') }}">
                 <button type="submit">Purchase Cart</button>
             </form>
         </div>
     </section>
+
 </main>
 {% endblock %}

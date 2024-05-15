@@ -227,7 +227,7 @@ footer p {
     font-size: 20px;
     text-align: center;
 }
-
+/*
 form {
     width: 300px;
     margin: 3% auto;
@@ -236,7 +236,7 @@ form {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
+*/
 label {
     display: block;
     margin-bottom: 10px;
