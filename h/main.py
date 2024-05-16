@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -53,6 +54,7 @@ def add_product():
             warranty=int(request.form['warranty']),
             colors=request.form['colors'],
             sizes=request.form['sizes'],
+            img=request.form['img'],
             price=float(request.form['price'])
         )
         db.session.add(new_product)
@@ -64,7 +66,7 @@ def add_product():
                 'title': new_product.title,
                 'description': new_product.description,
                 'price': new_product.price,
-                'image': "path_to_default_image.jpg"
+                'image': new_product.img
             }
         })
     except Exception as e:
@@ -133,7 +135,7 @@ def delete_product(product_id):
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    if 'logged_in' in session and session.get('user_type') == 'admin':
+    if 'logged_in' in session and session.get('username') == 'admin':
         return render_template('admin_dashboard.html')
     else:
         return redirect(url_for('login'))
@@ -209,7 +211,7 @@ def login():
             return redirect(url_for('home'))
         elif admin_user and admin_user.password == password:
             session['logged_in'] = True
-            session['user_type'] = 'admin'  # Set user type as admin
+            session['username'] = 'admin'  # Set user type as admin
             return redirect(url_for('admin_dashboard'))
         else:
             error = 'Invalid username or password. Please try again.'
@@ -227,29 +229,32 @@ def product_list():
 
 @app.route('/cart')
 def cart():
-    if 'logged_in' in session and session['username'] == 'customer':
-        user_id = session['user_id']
-        cart_items = shopping_cart.query.filter_by(userid=user_id).all()
+    if 'logged_in' in session:
+        if session['username'] == 'customer':
+            user_id = session['user_id']
+            cart_items = shopping_cart.query.filter_by(userid=user_id).all()
 
-        cart_details = []
-        subtotal = 0
-        for item in cart_items:
-            product = Product.query.get(item.productid)
-            item_total = product.price * int(item.quantity)
-            subtotal += item_total
-            cart_details.append({
-                'product_id': item.productid,
-                'title': product.title,
-                'price': product.price,
-                'quantity': item.quantity,
-                'subtotal': item_total
-            })
+            cart_details = []
+            subtotal = 0
+            for item in cart_items:
+                product = Product.query.get(item.productid)
+                item_total = product.price * int(item.quantity)
+                subtotal += item_total
+                cart_details.append({
+                    'product_id': item.productid,
+                    'title': product.title,
+                    'price': product.price,
+                    'quantity': item.quantity,
+                    'subtotal': item_total
+                })
 
-        tax = round(subtotal * 0.06, 2)
-        shipping_cost = 4
-        total_price = subtotal + tax + shipping_cost
+            tax = round(subtotal * 0.06, 2)
+            shipping_cost = 4
+            total_price = subtotal + tax + shipping_cost
 
-        return render_template('cart.html', cart_details=cart_details, total_price=total_price, tax=tax, shipping_cost=shipping_cost, subtotal=subtotal)
+            return render_template('cart.html', cart_details=cart_details, total_price=total_price, tax=tax, shipping_cost=shipping_cost, subtotal=subtotal)
+        elif session['username'] == 'admin':
+            return redirect(url_for('admin_dashboard'))  # Redirect admins to the admin dashboard
     else:
         flash('Please log in to view your cart.', 'error')
         return redirect(url_for('login'))
@@ -305,6 +310,8 @@ def checkout():
 
 @app.route('/receipt', methods=['GET', 'POST'])
 def receipt():
+    current_date = datetime.now().strftime('%Y-%m-%d')
+
     user_id = session['user_id']
     cart_items = shopping_cart.query.filter_by(userid=user_id).all()
     receipt_data = []
@@ -320,7 +327,7 @@ def receipt():
     for item in cart_items:
         db.session.delete(item)
     db.session.commit()
-    return render_template('receipt.html', receipt_data=receipt_data)
+    return render_template('receipt.html', receipt_data=receipt_data, current_date=current_date)
 
 
 @app.route('/vendors')
