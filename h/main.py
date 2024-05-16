@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1234@localhost/final180'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Gon20557@localhost/final180'
 db = SQLAlchemy(app)
 app.secret_key = 'shhhh'
 
@@ -25,6 +25,8 @@ class Product(db.Model):
     sizes = db.Column(db.Text, nullable=False)
     price = db.Column(db.Float, nullable=False)
     img = db.Column(db.Text)
+    is_featured = db.Column(db.Boolean, default=False)
+    is_promotional = db.Column(db.Boolean, default=False)
 
 
 class customer(db.Model):
@@ -55,7 +57,9 @@ def add_product():
             colors=request.form['colors'],
             sizes=request.form['sizes'],
             img=request.form['img'],
-            price=float(request.form['price'])
+            price=float(request.form['price']),
+            is_featured=bool(request.form.get('is_featured')),
+            is_promotional=bool(request.form.get('is_promotional'))
         )
         db.session.add(new_product)
         db.session.commit()
@@ -72,6 +76,8 @@ def add_product():
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)})
+
+
 
 @app.route('/admin/edit-product'
            '/<int:product_id>', methods=['POST'])
@@ -149,7 +155,12 @@ class vendor(db.Model):
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    featured_products = Product.query.filter_by(is_featured=True).all()
+    promotional_products = Product.query.filter_by(is_promotional=True).all()
+    all_products = Product.query.filter_by(is_featured=False, is_promotional=False).all()
+    return render_template('home.html', featured_products=featured_products, promotional_products=promotional_products, all_products=all_products)
+
+
 
 
 @app.route('/signup', methods=['GET', 'POST'])
