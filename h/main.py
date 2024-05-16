@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Gon20557@localhost/final180'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1234@localhost/final180'
 db = SQLAlchemy(app)
 app.secret_key = 'shhhh'
 
@@ -148,10 +148,10 @@ def admin_dashboard():
 
 
 class vendor(db.Model):
-    VendorID = db.Column(db.Text, unique=True, primary_key=True)
+    VendorID = db.Column(db.Integer, unique=True, primary_key=True, autoincrement= True)
     username = db.Column(db.Text)
     password = db.Column(db.Text)
-
+    email = db.Column(db.Text)
 
 @app.route('/')
 def home():
@@ -179,6 +179,19 @@ def signup():
                 return render_template('signup.html', error=error)
             new_admin = admin(username=username, firstname=firstname, lastname=lastname, password=password)
             db.session.add(new_admin)
+        elif role == 'vendor':
+            email = request.form['email']
+            existing_vendor_username = vendor.query.filter_by(username=username).first()
+            existing_vendor_email = vendor.query.filter_by(email=email).first()
+            if existing_vendor_username:
+                error = 'Username taken'
+                return render_template('signup.html', error=error)
+            if existing_vendor_email:
+                error = 'Email linked to an existing account'
+                return render_template('signup.html', error=error)
+            new_vendor = vendor(username=username, password=password,
+                                    email=email)
+            db.session.add(new_vendor)
         else:
             email = request.form['email']
             existing_customer_username = customer.query.filter_by(username=username).first()
@@ -188,14 +201,15 @@ def signup():
                 return render_template('signup.html', error=error)
             if existing_customer_email:
                 error = 'Email linked to an existing account'
-                return render_template('signup.html', error=error)
+                redirect(url_for('/login/vendors', error=error))
+                # return render_template('login.html', error=error)
             new_customer = customer(username=username, firstname=firstname, lastname=lastname, password=password,
                                     email=email)
             db.session.add(new_customer)
 
         try:
             db.session.commit()
-            return redirect(url_for('login'))
+            return redirect(url_for('home'))
         except Exception as e:
             db.session.rollback()
             return "Error: " + str(e)
